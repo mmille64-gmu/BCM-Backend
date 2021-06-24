@@ -26,17 +26,17 @@ public class FileLocation {
     @Column(name = "email")
     String email;
 
-    @Column(name = "location")
+    @Column(name = "locations")
     String location;
 
-    @Column(name = "keep_file")
-    Boolean keepFile;
-
-    @Column(name = "delete_file")
-    Boolean deleteFile;
-
-    @Column(name = "send_to_it")
-    Boolean sendToIT;
+//    @Column(name = "keep_file")
+//    Boolean keepFile;
+//
+//    @Column(name = "delete_file")
+//    Boolean deleteFile;
+//
+//    @Column(name = "send_to_it")
+//    Boolean sendToIT;
 
     @Column(name = "url")
     String url;
