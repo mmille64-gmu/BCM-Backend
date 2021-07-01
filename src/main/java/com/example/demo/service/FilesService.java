@@ -9,13 +9,17 @@ public interface FilesService {
 
     FileLocation findByUrl(String url);
 
+    FileLocation findByLocation(String location);
+
     List<FileLocation> findAllLocations();
 
-    FileLocation updateFileLocation(String email, FileLocation updatedFileLocation);
+    void updateFileLocation(String fileLocationLosingOwnership, FileLocation fileLocationGainingOwnership);
 
     List<String> findAllUsers();
 
     FileLocation getDuplicateUrls(String url);
+
+    FileLocation respondToForm(FileLocation responseToForm);
 
     void deleteFileLocation(String email);
 }

@@ -32,7 +32,7 @@ public class FilesController {
     public ResponseEntity getAllLocationByUrl(@PathVariable String url) { return ResponseEntity.ok(service.findByUrl(url));}
 
     @PutMapping("/{emailLosingOwnership}")
-    public ResponseEntity updateFilePrefrence(@PathVariable String emailLosingOwnership, @RequestBody FileLocation fileLocationGainingOwnership) { return ResponseEntity.ok(service.updateFileLocation(emailLosingOwnership,fileLocationGainingOwnership));}
+    public void updateFilePrefrence(@PathVariable String emailLosingOwnership, @RequestBody FileLocation fileLocationGainingOwnership) {service.updateFileLocation(emailLosingOwnership,fileLocationGainingOwnership);}
 
     @DeleteMapping("/{url}")
     public void deleteFileLocation(@PathVariable String url) {
@@ -43,5 +43,12 @@ public class FilesController {
     public FileLocation getAllDuplicateUrl(@PathVariable String url){
         return service.getDuplicateUrls(url);
     }
+
+    @GetMapping("/location/{location}")
+    public ResponseEntity getByLocation(@PathVariable String location) { return ResponseEntity.ok(service.findByLocation(location));}
+
+    @PutMapping("/response")
+    public ResponseEntity respondToForm(@RequestBody FileLocation fileLocationRespondedTo) { return ResponseEntity.ok(service.respondToForm(fileLocationRespondedTo));}
+
 }
 

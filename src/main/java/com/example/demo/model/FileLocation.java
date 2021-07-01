@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 
 @Getter
@@ -26,20 +28,24 @@ public class FileLocation {
     @Column(name = "email")
     String email;
 
-    @Column(name = "locations")
+    @Column(name = "location")
     String location;
 
-//    @Column(name = "keep_file")
-//    Boolean keepFile;
-//
-//    @Column(name = "delete_file")
-//    Boolean deleteFile;
-//
-//    @Column(name = "send_to_it")
-//    Boolean sendToIT;
+    @Column(name = "keep_file")
+    Boolean keepFile;
+
+    @Column(name = "delete_file")
+    Boolean deleteFile;
+
+    @Column(name = "send_to_it")
+    Boolean sendToIT;
 
     @Column(name = "url")
     String url;
+
+    @Column(name = "date_answered")
+    LocalDateTime dateAnswered;
+
 
 
 

@@ -8,6 +8,7 @@ import com.example.demo.repo.FilesRepo;
 
 import javax.persistence.NonUniqueResultException;
 import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,6 +52,19 @@ public class FilesServiceImpl implements FilesService {
     }
 
     @Override
+    public FileLocation findByLocation(String location){
+        FileLocation retreived = null;
+
+        Optional<FileLocation> files=repo.findByLocation(location);
+        if (files.isPresent()) {
+            retreived = files.get();
+            return retreived;
+        } else {
+            throw new IllegalArgumentException("No location found");
+        }
+    }
+
+    @Override
     public List<FileLocation> findAllLocations(){
         List<FileLocation> files=repo.findAll();
 
@@ -72,44 +86,84 @@ public class FilesServiceImpl implements FilesService {
     @Override
     public FileLocation getDuplicateUrls(String url) {
         List<FileLocation> allDupes = repo.findDuplicateUrls(url);
-        for(int i=1;i<allDupes.size();i++){
-            allDupes.get(0).setLocation(allDupes.get(0).getLocation()+","+allDupes.get(i).getLocation());
-            repo.deleteById(allDupes.get(i).getId());
+        FileLocation returnedLocations = new FileLocation();
+//        returnedLocations.setLocation(null);
+        for(int i=0;i<allDupes.size();i++){
+            if(!allDupes.get(i).getDeleteFile() && !allDupes.get(i).getKeepFile() && !allDupes.get(i).getSendToIT()){
+                if(returnedLocations.getLocation()==null){
+                    returnedLocations.setLocation(allDupes.get(i).getLocation());
+                } else {
+                    returnedLocations.setLocation(returnedLocations.getLocation()+","+allDupes.get(i).getLocation());
+                }
+            }
+//                repo.deleteById(allDupes.get(i).getId());
         }
-        repo.saveAndFlush(allDupes.get(0));
-        return allDupes.get(0);
+        returnedLocations.setUrl(allDupes.get(0).getUrl());
+        returnedLocations.setId(allDupes.get(0).getId());
+        returnedLocations.setEmail(allDupes.get(0).getEmail());
+        returnedLocations.setFirstName(allDupes.get(0).getFirstName());
+        returnedLocations.setLastName(allDupes.get(0).getLastName());
+//        repo.saveAndFlush(allDupes.get(0));
+        return returnedLocations;
     }
 
     @Override
-    public FileLocation updateFileLocation(String emailLosingOwnership, FileLocation fileLocationGainingOwnership) {
-        FileLocation oldFileLocation = null;
-        Optional<FileLocation> fileGrabber = repo.findByEmail(emailLosingOwnership);
+    public void updateFileLocation(String fileLocationLosingOwnership, FileLocation fileLocationGainingOwnership) {
+        List<FileLocation> allDupes = repo.findDuplicateUrls(fileLocationLosingOwnership);
 
-        if(fileGrabber.isPresent()){
-            oldFileLocation = fileGrabber.get();
+
+        for(int i=0;i< allDupes.size();i++){
+            allDupes.get(i).setEmail(fileLocationGainingOwnership.getEmail());
+            allDupes.get(i).setUrl(fileLocationGainingOwnership.getUrl());
+            allDupes.get(i).setFirstName(null);
+            allDupes.get(i).setLastName(null);
+            repo.save(allDupes.get(i));
+    }
+
+
+        //  OLD LOGIC
+        //        FileLocation oldFileLocation = null;
+//        Optional<FileLocation> fileGrabber = repo.findByEmail(emailLosingOwnership);
+//
+//        if(fileGrabber.isPresent()){
+//            oldFileLocation = fileGrabber.get();
+//        }
+//
+//        fileGrabber = repo.findByEmail(fileLocationGainingOwnership.getEmail());
+//
+//        if(fileGrabber.isPresent()){
+//            fileLocationGainingOwnership = fileGrabber.get();
+//        } else {
+//            String trimmedUrl = fileLocationGainingOwnership.getEmail().substring(0,fileLocationGainingOwnership.getEmail().indexOf("@"));
+//            fileLocationGainingOwnership.setUrl(trimmedUrl);
+//            fileLocationGainingOwnership.setLocation(oldFileLocation.getLocation());
+//            oldFileLocation.setLocation("");
+//            repo.save(oldFileLocation);
+//            return repo.saveAndFlush(fileLocationGainingOwnership);
+//        }
+//        if(fileLocationGainingOwnership.getLocation().length() > 1) {
+//            fileLocationGainingOwnership.setLocation(fileLocationGainingOwnership.getLocation() + "," + oldFileLocation.getLocation());
+//        } else {
+//            fileLocationGainingOwnership.setLocation(oldFileLocation.getLocation());
+//        }
+//        oldFileLocation.setLocation("");
+//
+//        repo.save(oldFileLocation);
+//        return repo.save(fileLocationGainingOwnership);
+    }
+
+    @Override
+    public FileLocation respondToForm(FileLocation responseToForm){
+        List<FileLocation> dupes = repo.findDuplicateUrls(responseToForm.getUrl());
+
+        for (int i = 0; i < dupes.size(); i++) {
+            if(dupes.get(i).getLocation().equals(responseToForm.getLocation())){
+                responseToForm.setId(dupes.get(i).getId());
+                break;
+            }
         }
-
-        fileGrabber = repo.findByEmail(fileLocationGainingOwnership.getEmail());
-
-        if(fileGrabber.isPresent()){
-            fileLocationGainingOwnership = fileGrabber.get();
-        } else {
-            String trimmedUrl = fileLocationGainingOwnership.getEmail().substring(0,fileLocationGainingOwnership.getEmail().indexOf("@"));
-            fileLocationGainingOwnership.setUrl(trimmedUrl);
-            fileLocationGainingOwnership.setLocation(oldFileLocation.getLocation());
-            oldFileLocation.setLocation("");
-            repo.save(oldFileLocation);
-            return repo.saveAndFlush(fileLocationGainingOwnership);
-        }
-        if(fileLocationGainingOwnership.getLocation().length() > 1) {
-            fileLocationGainingOwnership.setLocation(fileLocationGainingOwnership.getLocation() + "," + oldFileLocation.getLocation());
-        } else {
-            fileLocationGainingOwnership.setLocation(oldFileLocation.getLocation());
-        }
-        oldFileLocation.setLocation("");
-
-        repo.save(oldFileLocation);
-        return repo.save(fileLocationGainingOwnership);
+        responseToForm.setDateAnswered(LocalDateTime.now());
+        return repo.save(responseToForm);
     }
 
     @Override

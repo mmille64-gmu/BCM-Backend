@@ -16,6 +16,8 @@ public interface FilesRepo extends JpaRepository<FileLocation,Integer> {
 
     Optional<FileLocation> findByUrl(@Param("url") String url);
 
+    Optional<FileLocation> findByLocation(@Param("locations") String locations);
+
     @Query("SELECT u FROM un_reviewed_files u WHERE u.url=:newUrl")
     List<FileLocation> findDuplicateUrls(@Param("newUrl") String newUrl);
 
