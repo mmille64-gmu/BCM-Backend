@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Table(name = "bcm_table")
-@Entity(name = "bcm_table")
+@Table(name = "ReviewedFiles")
+@Entity(name = "ReviewedFiles")
 
 public class ReviewedFile {
 
