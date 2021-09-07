@@ -10,8 +10,8 @@ import java.util.Date;
 
 @Getter
 @Setter
-@Table(name = "un_reviewed_files")
-@Entity(name = "un_reviewed_files")
+@Table(name = "bcm_table")
+@Entity(name = "bcm_table")
 public class FileLocation {
 
     @Id
